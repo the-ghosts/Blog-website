@@ -1,0 +1,57 @@
+{% extends 'htmls/base.html'%}
+{% block title %} Detail Page {% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class= "container">
+        <div class="row mt-5 pt-3">
+            <div class="col-md-8 offset-md-2">
+                <div class="card my-3 shadow">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img class= img-thumbnail src="{{ post.author.profilemodel.image.url }}" alt="profile-img">
+                            </div>
+                            <div class= "col-md-8">
+                                <small>{{ post.date_created }}</small>
+                                {% if post.author == request.user %}
+                                <span><a class="btn btn-danger float-right btn-sm" href="{% url 'Post delete' post.id %}">Delete</a></span>
+                                <span><a class="btn btn-primary mx-2 float-right btn-sm" href="{% url 'Post edit' post.id %}">Edit</a></span>
+                                {% endif %}
+                                <hr>
+                                <h4>{{ post.title }}</h4>
+                                <p>{{post.content }}</p>
+                                <div>
+                                    <a href="{% url 'react_to_post' post.id 'like' %}">👍 Like {{ post.total_likes }}</a>
+                                    <a href="{% url 'react_to_post' post.id 'dislike' %}">👎 Dislike {{ post.total_dislikes }}</a>
+                                </div>
+                            </div>
+                        </div>
+                        <p class= "mt-4">
+                            <a class="" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">{{post.comment_count}} Comments
+                            </a>
+                        </p>
+                        <div class="collapse" id="collapseExample">
+                            <div style= "height: 250px; overflow-y: scroll; " class="card card-body">
+                                {% for comment in comments %}
+                                    <div class="comment-container">
+                                        
+                                        <strong>{{ comment.user.username }}</strong>
+                                        <small>{{ comment.date_created }}</small>
+                                        <p>{{ comment.comments }}</p>
+                                    </div>
+                                    {% empty %}
+                                    <p>No comments yet. Be the first to comment!</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <form method = "POST">
+                            {% csrf_token %}
+                            {{ comment_form|crispy }}
+                            <input class= "btn btn-primary btn-sm" type= "submit" value= "Comment"></input>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
